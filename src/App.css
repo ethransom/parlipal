@@ -1,0 +1,58 @@
+.App {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  position: absolute;
+
+  font-size: 20px;
+}
+
+
+aside {
+  width: 300px;
+  padding: 10px 20px;
+}
+
+main {
+  padding: 10px 20px;
+  flex: 1;
+}
+
+section.motion {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+section.motion div {
+  flex: 1;
+  border: 1px solid grey;
+  padding: 5px;
+}
+
+section.motion div * {
+  border: 0;
+}
+
+section.timer {
+  background-color: lightgreen;
+}
+
+section.timer.warning {
+  background-color: #fffb91;
+}
+
+section.timer.ended {
+  background-color: lightcoral;
+}
+
+section.timer h1 {
+  font-size: 300%;
+  margin: 20px;
+  text-align: center;
+}
