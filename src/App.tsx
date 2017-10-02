@@ -3,7 +3,12 @@ import './App.css';
 
 class Timer extends React.Component {
   props = {
-    title: ""
+    title: "",
+    value: 10*60,
+  }
+
+  componentWillMount() {
+    this.setState({value: this.props.value, origValue: this.props.value});
   }
 
   state = {
@@ -14,16 +19,21 @@ class Timer extends React.Component {
   private timer: number | null = null;
 
   private start = () => {
+    if (this.timer) {
+      return;
+    }
     this.timer = window.setInterval(this.tick, 1000);
   }
 
   private stop = () => {
-    if (this.timer) {
-      window.clearInterval(this.timer);
+    if (!this.timer) {
+      return;
     }
+    window.clearInterval(this.timer);
   }
 
   private set = () => {
+    this.stop();
     let val: string | null = null;
     while (val == null || isNaN(parseInt(val))) {
       val = prompt("Set the timer for x minutes:");
@@ -32,7 +42,11 @@ class Timer extends React.Component {
     let seconds = parseInt(val) * 60;
 
     this.setState({origValue: seconds, value: seconds});
-    stop();
+  }
+
+  private reset = () => {
+    this.stop();
+    this.setState({value: this.state.origValue});
   }
 
   private tick = () => {
@@ -80,6 +94,7 @@ class Timer extends React.Component {
           <button onClick={this.start}>Start</button>
           <button onClick={this.stop}>Stop</button>
           <button onClick={this.set}>Set</button>
+          <button onClick={this.reset}>Reset</button>
         </p>
       </section>
     )
@@ -91,6 +106,20 @@ class Timer extends React.Component {
 //     speakers: [] as Array<string>,
 //   }
 
+//   newSpeaker: HTMLInputElement | null = null
+
+//   private addSpeaker = () => {
+//     if (!this.newSpeaker) {
+//       return;
+//     }
+
+//     let newSpeaker = this.newSpeaker.value;
+
+//     this.setState({speakers: this.state.speakers.concat(newSpeaker)});
+
+//     this.newSpeaker.value = "";
+//   }
+
 //   private renderSpeaker(speaker: string) {
 //     return <li>{speaker}</li>;
 //   }
@@ -99,6 +128,8 @@ class Timer extends React.Component {
 //     return (
 //       <section className="speakersList">
 //         <h3>Speakers List</h3>
+//         <input type="text" ref={(elm) => this.newSpeaker = elm}/>
+//         <button onClick={this.addSpeaker}>Add</button>
 //         <ul>
 //           {this.state.speakers.map(this.renderSpeaker, this)}
 //         </ul>
@@ -125,9 +156,9 @@ class App extends React.Component {
     return (
       <div className="App">
         <aside>
-          <Timer title="Agenda Item"/>
-          <Timer title="Discussion"/>
-          {/* <SpeakersList/> */}
+          <Timer value={10*60} title="Agenda Item"/>
+          <Timer value={5*60} title="Discussion"/>
+          {/* <SpeakersList/>  */}
         </aside>
         <main>
           <Motion/>
