@@ -1,1 +1,2 @@
-scp -r build/* shplah.com:/home/nginx/www/shplah.com/parlipal
+# sync to Google Cloud Storage bucket
+gsutil rsync -R build gs://www.parlipal.com
