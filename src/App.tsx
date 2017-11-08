@@ -29,7 +29,15 @@ class Timer extends React.Component {
     if (!this.timer) {
       return;
     }
+    this.clearTimer();
+  }
+
+  private clearTimer() {
+    if (!this.timer) {
+      return;
+    }
     window.clearInterval(this.timer);
+    this.timer = null;
   }
 
   private set = () => {
@@ -56,6 +64,7 @@ class Timer extends React.Component {
 
     if (value < 0) {
       value = 0;
+      this.clearTimer();
     }
 
     this.setState({value: value});
