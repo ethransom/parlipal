@@ -4,10 +4,91 @@ import './App.css';
 function getNumber(message: string) {
   let val: string | null = null;
   while (val == null || isNaN(parseInt(val))) {
-    val = prompt("Set the timer for x minutes:");
+    val = prompt(message);
   }
 
   return parseInt(val);
+}
+
+class SpeakersTimer extends React.Component {
+  state = {
+    value: 30,
+    origValue: 30,
+  }
+
+  private timer: number | null = null;
+
+  set = () => {
+    this.reset();
+
+    let value = getNumber("enter number of SECONDS for speakers");
+
+    this.setState({
+      value: value,
+      origValue: value,
+    });
+  }
+
+  next = () => {
+    this.reset();
+    this.start();
+  }
+
+  start = () => {
+    if (!this.timer && this.state.value > 0) {
+      this.timer = window.setInterval(this.tick, 1000);
+    }
+  }
+
+  reset = () => {
+    this.stop();
+    this.setState({value: this.state.origValue});
+  }
+
+  private stop() {
+    if (this.timer) {
+      window.clearInterval(this.timer);
+      this.timer = null;
+    }
+  }
+
+  private tick = () => {
+    let newValue = this.state.value - 1;
+    if (newValue === 0) {
+      this.stop();
+    }
+    this.setState({value: newValue});
+  }
+
+  private renderTime() {
+    return (
+      <h1>{this.state.value} / {this.state.origValue}</h1>
+    )
+  }
+
+  render() {
+    let className = "timer";
+    if (this.state.value === 0) {
+      className += " ended";
+    } else if (this.state.value <= 10) {
+      className += " warning";
+    }
+
+    return (
+      <section className={className}>
+        <h3>Speaker</h3>
+
+        {this.renderTime()}
+
+        <p>
+          <button onClick={this.next}>Next</button>
+          <button onClick={this.start}>Start</button>
+          <button onClick={this.set}>Set</button>
+          <button onClick={this.reset}>Reset</button>
+        </p>
+      </section>
+    )
+  }
 }
 
 class Timer extends React.Component {
@@ -191,6 +272,7 @@ class App extends React.Component {
         <aside>
           <Timer value={10*60} title="Agenda Item"/>
           <Timer value={5*60} title="Discussion"/>
+          <SpeakersTimer/>
           {/* <SpeakersList/>  */}
         </aside>
         <main>
