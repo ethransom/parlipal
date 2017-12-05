@@ -1,6 +1,15 @@
 import * as React from 'react';
 import './App.css';
 
+function getNumber(message: string) {
+  let val: string | null = null;
+  while (val == null || isNaN(parseInt(val))) {
+    val = prompt("Set the timer for x minutes:");
+  }
+
+  return parseInt(val);
+}
+
 class Timer extends React.Component {
   props = {
     title: "",
@@ -14,6 +23,7 @@ class Timer extends React.Component {
   state = {
     origValue: 10*60,
     value: 10*60,
+    ticking: false,
   }
 
   private timer: number | null = null;
@@ -23,6 +33,7 @@ class Timer extends React.Component {
       return;
     }
     this.timer = window.setInterval(this.tick, 1000);
+    this.setState({ticking: true});
   }
 
   private stop = () => {
@@ -38,16 +49,13 @@ class Timer extends React.Component {
     }
     window.clearInterval(this.timer);
     this.timer = null;
+    this.setState({ticking: false});
   }
 
   private set = () => {
     this.stop();
-    let val: string | null = null;
-    while (val == null || isNaN(parseInt(val))) {
-      val = prompt("Set the timer for x minutes:");
-    }
 
-    let seconds = parseInt(val) * 60;
+    let seconds = getNumber("Set the timer for x minutes") * 60;
 
     this.setState({origValue: seconds, value: seconds});
   }
@@ -55,6 +63,17 @@ class Timer extends React.Component {
   private reset = () => {
     this.stop();
     this.setState({value: this.state.origValue});
+  }
+
+  extend = () => {
+    let amount = getNumber("Extend timer by x minutes");
+
+    let seconds = amount * 60;
+
+    this.setState({
+      value: this.state.value + seconds,
+      origValue: this.state.origValue + seconds
+    });
   }
 
   private tick = () => {
@@ -90,6 +109,9 @@ class Timer extends React.Component {
     } else if (this.state.value < 60) {
       className += " warning";
     }
+    if (this.state.ticking) {
+      className += " ticking";
+    }
 
     return (
       <section className={className}>
@@ -100,10 +122,12 @@ class Timer extends React.Component {
         <progress value={-1 * this.state.value + this.state.origValue} max={this.state.origValue}></progress>
 
         <p>
-          <button onClick={this.start}>Start</button>
-          <button onClick={this.stop}>Stop</button>
+          {this.state.ticking ? 
+            <button onClick={this.stop}>Stop</button> :
+            <button onClick={this.start}>Start</button>}
           <button onClick={this.set}>Set</button>
           <button onClick={this.reset}>Reset</button>
+          <button onClick={this.extend}>Extend</button>
         </p>
       </section>
     )
