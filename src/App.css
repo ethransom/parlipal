@@ -14,11 +14,15 @@
 
 
 aside {
-  width: 300px;
+  width: 250px;
   padding: 10px 20px;
   display: flex;
   flex-direction: column;
   /* justify-content: space-between; */
+}
+
+aside button {
+  margin-bottom: 10px;
 }
 
 main {
@@ -56,6 +60,7 @@ section.timer {
 
 section.timer h3 {
   margin: 5px 0;
+  font-size: 18px;
 }
 
 section.timer.warning {
@@ -67,11 +72,21 @@ section.timer.ended {
 }
 
 section.timer h1 {
-  font-size: 300%;
-  margin: 20px;
+  font-size: 72px;
+  font-weight: bold;
+  margin: 12px;
   text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 section.timer p {
-   margin: 5px; 
+   margin: 5px;
+}
+
+div.popupBackground {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
 }

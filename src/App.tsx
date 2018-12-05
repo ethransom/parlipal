@@ -11,9 +11,22 @@ function getNumber(message: string) {
 }
 
 class SpeakersTimer extends React.Component {
+  props: {
+    value: number,
+  };
+
+  componentWillMount() {
+    this.setState({value: this.props.value, origValue: this.props.value});
+  }
+
+  componentWillUnmount() {
+    if (this.timer !== null) window.clearInterval(this.timer);
+  }
+
   state = {
     value: 30,
     origValue: 30,
+    ticking: false,
   }
 
   private timer: number | null = null;
@@ -38,6 +51,7 @@ class SpeakersTimer extends React.Component {
     if (!this.timer && this.state.value > 0) {
       this.timer = window.setInterval(this.tick, 1000);
     }
+    this.setState({ticking: true});
   }
 
   reset = () => {
@@ -45,11 +59,12 @@ class SpeakersTimer extends React.Component {
     this.setState({value: this.state.origValue});
   }
 
-  private stop() {
+  private stop = () => {
     if (this.timer) {
       window.clearInterval(this.timer);
       this.timer = null;
     }
+    this.setState({ticking: false});
   }
 
   private tick = () => {
@@ -62,7 +77,7 @@ class SpeakersTimer extends React.Component {
 
   private renderTime() {
     return (
-      <h1>{this.state.value} / {this.state.origValue}</h1>
+      <h1>{this.state.value}</h1>
     )
   }
 
@@ -81,10 +96,12 @@ class SpeakersTimer extends React.Component {
         {this.renderTime()}
 
         <p>
-          <button onClick={this.next}>Next</button>
-          <button onClick={this.start}>Start</button>
-          <button onClick={this.set}>Set</button>
-          <button onClick={this.reset}>Reset</button>
+          {this.timer ?
+            <button className="btn btn-sm btn-primary" onClick={this.stop}>Stop</button> :
+            <button className="btn btn-sm btn-primary" onClick={this.start}>Start</button>}
+          <button className="btn btn-sm btn-primary" onClick={this.next}>Next</button>
+          {/* <button className="btn btn-sm btn-primary"  onClick={this.set}>Set</button> */}
+          <button className="btn btn-sm btn-primary"  onClick={this.reset}>Reset</button>
         </p>
       </section>
     )
@@ -99,6 +116,10 @@ class Timer extends React.Component {
 
   componentWillMount() {
     this.setState({value: this.props.value, origValue: this.props.value});
+  }
+
+  componentWillUnmount() {
+    if (this.timer !== null) window.clearInterval(this.timer);
   }
 
   state = {
@@ -133,13 +154,13 @@ class Timer extends React.Component {
     this.setState({ticking: false});
   }
 
-  private set = () => {
-    this.stop();
+  // private set = () => {
+  //   this.stop();
 
-    let seconds = getNumber("Set the timer for x minutes") * 60;
+  //   let seconds = getNumber("Set the timer for x minutes") * 60;
 
-    this.setState({origValue: seconds, value: seconds});
-  }
+  //   this.setState({origValue: seconds, value: seconds});
+  // }
 
   private reset = () => {
     this.stop();
@@ -204,11 +225,11 @@ class Timer extends React.Component {
 
         <p>
           {this.state.ticking ?
-            <button onClick={this.stop}>Stop</button> :
-            <button onClick={this.start}>Start</button>}
-          <button onClick={this.set}>Set</button>
-          <button onClick={this.reset}>Reset</button>
-          <button onClick={this.extend}>Extend</button>
+            <button className="btn btn-sm btn-primary" onClick={this.stop}>Stop</button> :
+            <button className="btn btn-sm btn-primary" onClick={this.start}>Start</button>}
+          {/* <button className="btn btn-sm btn-primary" onClick={this.set}>Set</button> */}
+          <button className="btn btn-sm btn-primary" onClick={this.reset}>Reset</button>
+          <button className="btn btn-sm btn-primary" onClick={this.extend}>Extend</button>
         </p>
       </section>
     )
@@ -252,31 +273,165 @@ class Timer extends React.Component {
 //   }
 // }
 
-class Motion extends React.Component {
+class Motion extends React.PureComponent {
   render() {
     return (
       <section className="motion">
         <h1>Motion under discussion</h1>
-        <div contentEditable={true}>
-          Edit me
-        </div>
+        <div contentEditable={true}>Edit me</div>
       </section>
     )
   }
 }
 
-class App extends React.Component {
+class NewDiscussionPopup extends React.Component {
+  props: {
+    active: boolean,
+    onSubmit: (discussion: number, speaker: number) => void,
+    onCancel: ()=> void,
+  };
+
+  state = {
+    discussion: 5,
+    speaker: 30,
+  }
+
+  close = () => {
+    this.props.onCancel();
+  }
+
+  submit = () => {
+    this.props.onSubmit(this.state.discussion, this.state.speaker);
+  }
+
+  render() {
+    if (!this.props.active) {
+      return null;
+    }
+
+    return (
+      <div className="popupBackground">
+        <div className="popup">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Start New Discussion</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={this.close}>
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <form>
+                  <div className="form-group">
+                    <label htmlFor="discussionMinutes">Discussion Limit</label>
+                    <input type="number" className="form-control" id="discussionMinutes"
+                      onChange={e => this.setState({discussion: e.target.value})} value={this.state.discussion}/*placeholder="Password"*//>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="speakerSeconds">Speaker Limit</label>
+                    <input type="number" className="form-control" id="speakerSeconds"
+                      onChange={e => this.setState({speaker: e.target.value})} value={this.state.speaker} /*placeholder="Password"*//>
+                  </div>
+                </form>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.close}>Close</button>
+                <button type="button" className="btn btn-primary" onClick={this.submit}>Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+function EndDiscussionPopup(props: {active: boolean, onSubmit: () => void, onCancel: () => void}) {
+  if (!props.active) {
+    return null;
+  }
+
+  return (
+    <div className="popupBackground">
+      <div className="popup">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">Really End Discussion?</h5>
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={props.onCancel}>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              Pls confirm this action.
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={props.onCancel}>Close</button>
+              <button type="button" className="btn btn-danger" onClick={props.onSubmit}>End Discussion</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface AppState {
+  newDiscussionPopupActive: boolean;
+  endDiscussionPopupActive: boolean;
+  discussionSeq: number;
+  discussionMinutes: number;
+  speakerSeconds: number;
+}
+
+class App extends React.Component<{}, AppState> {
+  state = {
+    newDiscussionPopupActive: false,
+    endDiscussionPopupActive: false,
+    discussionSeq: 0, // bit of a hack, we need creating a new discussion with the same time as the old to reset the timer
+    discussionMinutes: 5 * 60,
+    speakerSeconds: 30,
+  };
+
+  newDiscussion = (discussion: number, speaker: number) => {
+    console.log(`New discussion: ${discussion} minutes, with ${speaker} seconds for speakers`);
+    this.setState((state: AppState) => ({
+      discussionSeq: state.discussionSeq + 1,
+      discussionMinutes: discussion * 60,
+      speakerSeconds: speaker,
+      newDicussionPopupActive: false,
+    }));
+  }
+
+  endDiscussion = () => {
+    console.log("Ending discussion");
+    this.setState((state: AppState) => ({
+      discussionSeq: state.discussionSeq + 1,
+      endDiscussionPopupActive: false,
+    }));
+  }
+
   render() {
     return (
       <div className="App">
         <aside>
-          <Timer value={5*60} title="Discussion"/>
-          <SpeakersTimer/>
+          <Timer key={'timer-'+this.state.discussionSeq} value={this.state.discussionMinutes} title="Discussion"/>
+          <SpeakersTimer key={'speakers-'+this.state.discussionSeq} value={this.state.speakerSeconds}/>
           {/* <SpeakersList/>  */}
+          <button onClick={() => this.setState({newDiscussionPopupActive: true})} className="btn btn-primary">New Discussion</button>
+          <button onClick={() => this.setState({endDiscussionPopupActive: true})} className="btn btn-danger">End Discussion</button>
         </aside>
         <main>
           <Motion/>
         </main>
+        <NewDiscussionPopup
+          active={this.state.newDiscussionPopupActive}
+          onSubmit={this.newDiscussion}
+          onCancel={() => this.setState({newDiscussionPopupActive: false})}/>
+        <EndDiscussionPopup
+          active={this.state.endDiscussionPopupActive}
+          onSubmit={this.endDiscussion}
+          onCancel={() => this.setState({endDiscussionPopupActive: false})}/>
       </div>
     );
   }
