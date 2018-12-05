@@ -395,17 +395,17 @@ class App extends React.Component<{}, AppState> {
 
   newDiscussion = (discussion: number, speaker: number) => {
     console.log(`New discussion: ${discussion} minutes, with ${speaker} seconds for speakers`);
-    this.setState((state: AppState) => ({
+    this.setState((state: AppState): Partial<AppState> => ({
       discussionSeq: state.discussionSeq + 1,
       discussionMinutes: discussion * 60,
       speakerSeconds: speaker,
-      newDicussionPopupActive: false,
+      newDiscussionPopupActive: false,
     }));
   }
 
   endDiscussion = () => {
     console.log("Ending discussion");
-    this.setState((state: AppState) => ({
+    this.setState((state: AppState): Partial<AppState> => ({
       discussionSeq: state.discussionSeq + 1,
       endDiscussionPopupActive: false,
     }));
