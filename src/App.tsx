@@ -203,7 +203,7 @@ class Timer extends React.Component {
         <progress value={-1 * this.state.value + this.state.origValue} max={this.state.origValue}></progress>
 
         <p>
-          {this.state.ticking ? 
+          {this.state.ticking ?
             <button onClick={this.stop}>Stop</button> :
             <button onClick={this.start}>Start</button>}
           <button onClick={this.set}>Set</button>
@@ -270,7 +270,6 @@ class App extends React.Component {
     return (
       <div className="App">
         <aside>
-          <Timer value={10*60} title="Agenda Item"/>
           <Timer value={5*60} title="Discussion"/>
           <SpeakersTimer/>
           {/* <SpeakersList/>  */}
